@@ -6,12 +6,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { WallpaperProvider } from "./context/WallpaperContext";
 import Navigation from "./components/Navigation";
+import Header from "./components/Header";
 import HomePage from "./pages/HomePage";
 import CategoriesPage from "./pages/CategoriesPage";
 import CategoryDetailPage from "./pages/CategoryDetailPage";
 import SearchPage from "./pages/SearchPage";
 import FavoritesPage from "./pages/FavoritesPage";
 import WallpaperDetailPage from "./pages/WallpaperDetailPage";
+import CreditsPage from "./pages/CreditsPage";
+import PricingPage from "./pages/PricingPage";
+import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,15 +27,28 @@ const App = () => (
         <BrowserRouter>
           <Toaster />
           <Sonner />
+          
+          {/* Header is visible on all pages except WallpaperDetailPage */}
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/categories" element={<CategoriesPage />} />
-            <Route path="/category/:categoryId" element={<CategoryDetailPage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/wallpaper/:wallpaperId" element={<WallpaperDetailPage />} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="*" element={
+              <>
+                <Header />
+                <Routes>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/categories" element={<CategoriesPage />} />
+                  <Route path="/category/:categoryId" element={<CategoryDetailPage />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="/favorites" element={<FavoritesPage />} />
+                  <Route path="/credits" element={<CreditsPage />} />
+                  <Route path="/pricing" element={<PricingPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </>
+            } />
           </Routes>
+          
           <Navigation />
         </BrowserRouter>
       </WallpaperProvider>

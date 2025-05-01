@@ -23,7 +23,7 @@ const WallpaperDetailPage = () => {
     queryKey: ['wallpaper', wallpaperId],
     queryFn: () => wallpaperService.getWallpaperById(wallpaperId!),
     enabled: !!wallpaperId,
-    onSettled: (data) => {
+    onSuccess: (data) => {
       if (data) {
         setIsFav(data.isFavorite || wallpaperService.isFavorite(data.id));
       }
