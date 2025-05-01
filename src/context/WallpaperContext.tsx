@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { Wallpaper } from '../types/wallpaper';
 import { toast } from '../components/ui/use-toast';
@@ -7,11 +6,17 @@ interface WallpaperContextType {
   downloadWallpaper: (wallpaper: Wallpaper) => void;
   applyWallpaper: (wallpaper: Wallpaper) => void;
   shareWallpaper: (wallpaper: Wallpaper) => void;
+  setActiveWallpaper: (wallpaper: Wallpaper) => void;
+  toggleFavorite: (wallpaperId: string) => void;
+  isFavorite: (wallpaperId: string) => boolean;
 }
 
 const WallpaperContext = createContext<WallpaperContextType | undefined>(undefined);
 
 export const WallpaperProvider = ({ children }: { children: ReactNode }) => {
+  const [activeWallpaper, setActiveWallpaper] = useState<Wallpaper | null>(null);
+  const [favorites, setFavorites] = useState<string[]>([]);
+
   const downloadWallpaper = (wallpaper: Wallpaper) => {
     // In a real app, we'd implement actual download functionality
     // For now, just show a toast message
@@ -43,10 +48,29 @@ export const WallpaperProvider = ({ children }: { children: ReactNode }) => {
     console.log('Sharing wallpaper:', wallpaper);
   };
 
+  const handleSetActiveWallpaper = (wallpaper: Wallpaper) => {
+    setActiveWallpaper(wallpaper);
+  };
+
+  const toggleFavorite = (wallpaperId: string) => {
+    setFavorites(current => 
+      current.includes(wallpaperId)
+        ? current.filter(id => id !== wallpaperId)
+        : [...current, wallpaperId]
+    );
+  };
+
+  const isFavorite = (wallpaperId: string): boolean => {
+    return favorites.includes(wallpaperId);
+  };
+
   const value = {
     downloadWallpaper,
     applyWallpaper,
     shareWallpaper,
+    setActiveWallpaper: handleSetActiveWallpaper,
+    toggleFavorite,
+    isFavorite
   };
 
   return (
