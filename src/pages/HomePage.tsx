@@ -21,7 +21,7 @@ const HomePage = () => {
   return (
     <div className="pb-20 pt-4 px-4">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-1">WallHub</h1>
+        <h1 className="text-2xl font-bold mb-1">Vibe Vault</h1>
         <p className="text-muted-foreground">Find your perfect wallpaper</p>
       </div>
       

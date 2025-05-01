@@ -3,7 +3,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'app.lovable.46a327f34b8b41b195e47b34c5807815',
-  appName: 'WallHub',
+  appName: 'Vibe Vault',
   webDir: 'dist',
   server: {
     url: 'https://46a327f3-4b8b-41b1-95e4-7b34c5807815.lovableproject.com?forceHideBadge=true',
