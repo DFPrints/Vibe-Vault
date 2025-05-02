@@ -3,6 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { Wallpaper } from '../types/wallpaper';
 import { mapWallpaper } from './mappers';
 
+// Define proper type for the RPC function parameters
+type IncrementCategoryCountParams = {
+  category_id: string;
+};
+
 export const adminService = {
   uploadWallpaper: async (
     file: File,
@@ -48,7 +53,7 @@ export const adminService = {
           thumbnail_url: thumbnailUrl,
           category_id: wallpaperData.category,
           tags: wallpaperData.tags,
-          compatible_devices: wallpaperData.compatibleDevices || [], // Fix: Type assertion removed, providing default empty array
+          compatible_devices: wallpaperData.compatibleDevices || [],
           width: img.width,
           height: img.height
         })
@@ -58,9 +63,10 @@ export const adminService = {
       if (insertError) throw insertError;
       
       // 6. Update the category count
-      await supabase.rpc('increment_category_count', { 
-        category_id: wallpaperData.category 
-      } as { category_id: string });  // Fix: Added proper type assertion for RPC parameters
+      await supabase.rpc<null, IncrementCategoryCountParams>(
+        'increment_category_count', 
+        { category_id: wallpaperData.category }
+      );
       
       return mapWallpaper(wallpaperRecord);
     } catch (error) {
