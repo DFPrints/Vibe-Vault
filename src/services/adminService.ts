@@ -63,9 +63,9 @@ export const adminService = {
       if (insertError) throw insertError;
       
       // 6. Update the category count
-      const { error: rpcError } = await supabase.rpc(
-        'increment_category_count',
-        { category_id: wallpaperData.category }
+      const { error: rpcError } = await supabase.rpc<void>(
+        'increment_category_count' as any,
+        { category_id: wallpaperData.category } as IncrementCategoryCountParams
       );
       
       if (rpcError) console.error("Error updating category count:", rpcError);
