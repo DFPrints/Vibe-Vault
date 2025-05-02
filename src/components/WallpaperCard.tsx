@@ -20,12 +20,16 @@ const WallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps) => {
     e.preventDefault();
     e.stopPropagation();
     
-    const result = await wallpaperService.toggleFavorite(wallpaper.id);
-    setIsFav(result);
-    
-    // Invalidate relevant queries to refresh data
-    queryClient.invalidateQueries({ queryKey: ['wallpapers'] });
-    queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    try {
+      const result = await wallpaperService.toggleFavorite(wallpaper.id);
+      setIsFav(result); // Now correctly using a boolean value
+      
+      // Invalidate relevant queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['wallpapers'] });
+      queryClient.invalidateQueries({ queryKey: ['favorites'] });
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
   };
   
   return (
