@@ -3,6 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { Wallpaper } from '../types/wallpaper';
 import { mapWallpaper } from './mappers';
 
+// Define type for search parameters
+type SearchWallpapersByTagParams = {
+  search_term: string;
+};
+
 export const wallpaperFetchService = {
   getWallpapers: async (): Promise<Wallpaper[]> => {
     const { data, error } = await supabase
@@ -64,7 +69,7 @@ export const wallpaperFetchService = {
     // Search by tags (requires array contains in Postgres)
     const { data: tagResults, error: tagError } = await supabase.rpc(
       'search_wallpapers_by_tag',
-      { search_term: term }
+      { search_term: term } as SearchWallpapersByTagParams
     );
     
     if (tagError) {

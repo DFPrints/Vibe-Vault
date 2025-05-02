@@ -65,7 +65,7 @@ export const adminService = {
       // 6. Update the category count
       await supabase.rpc(
         'increment_category_count', 
-        { category_id: wallpaperData.category }
+        { category_id: wallpaperData.category } as IncrementCategoryCountParams
       );
       
       return mapWallpaper(wallpaperRecord);
