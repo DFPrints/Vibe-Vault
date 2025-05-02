@@ -48,7 +48,7 @@ export const adminService = {
           thumbnail_url: thumbnailUrl,
           category_id: wallpaperData.category,
           tags: wallpaperData.tags,
-          compatible_devices: wallpaperData.compatibleDevices as any[] || [], // Type assertion to fix TS error
+          compatible_devices: wallpaperData.compatibleDevices || [], // Fix: Type assertion removed, providing default empty array
           width: img.width,
           height: img.height
         })
