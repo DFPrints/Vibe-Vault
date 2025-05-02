@@ -86,6 +86,7 @@ export const wallpaperService = {
     }
     
     // Search by tags (requires array contains in Postgres)
+    // Fix for line 90: Use the proper type for search_term parameter
     const { data: tagResults, error: tagError } = await supabase.rpc(
       'search_wallpapers_by_tag',
       { search_term: term }
@@ -242,6 +243,7 @@ export const wallpaperService = {
       });
       
       // 5. Insert the wallpaper into the database
+      // Fix for line 263: Use the proper type for compatible_devices
       const { data: wallpaperRecord, error: insertError } = await supabase
         .from('wallpapers')
         .insert({
