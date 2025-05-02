@@ -1,1 +1,8 @@
+
 project_id = "uqeqxgkmlagdsiyditny"
+
+[functions.search_wallpapers_by_tag]
+verify_jwt = true
+
+[functions.increment_category_count]
+verify_jwt = true

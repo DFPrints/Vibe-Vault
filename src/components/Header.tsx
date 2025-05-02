@@ -1,10 +1,13 @@
 
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   ChevronDown,
   UserRound,
-  Coins
+  Coins,
+  LogIn,
+  Settings,
+  Upload
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { wallpaperService } from '@/services/wallpaperService';
@@ -18,19 +21,21 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, profile, isAdmin, signOut } = useAuth();
+  
   const { data: categories, isPending } = useQuery({
     queryKey: ['categories'],
     queryFn: wallpaperService.getCategories
   });
 
-  // Mock user data - would come from auth context in a real app
-  const user = {
-    name: 'User',
-    credits: 100,
-    isPremium: false
+  const handleSignOut = async () => {
+    await signOut();
+    toast.success("Logged out successfully");
   };
   
   return (
@@ -61,52 +66,72 @@ const Header = () => {
         </div>
         
         <div className="flex items-center gap-3">
-          {/* Credits display */}
-          <div className="flex items-center bg-muted/50 px-3 py-1 rounded-full">
-            <Coins size={16} className="text-amber-500 mr-1" />
-            <span className="text-sm font-medium">{user.credits}</span>
-          </div>
-          
-          {/* Profile dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="rounded-full w-9 h-9 p-0">
-                <Avatar className="h-9 w-9">
-                  <AvatarFallback className="bg-wallpaper-purple text-white">
-                    {user.name.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <div className="flex items-center justify-start p-2">
-                <Avatar className="h-8 w-8 mr-2">
-                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col space-y-0.5">
-                  <p className="text-sm font-medium">{user.name}</p>
-                  <p className="text-xs text-muted-foreground">Free Plan</p>
-                </div>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link to="/profile" className="cursor-pointer">Profile Settings</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/credits" className="cursor-pointer">Buy Credits</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link to="/pricing" className="cursor-pointer">Upgrade Plan</Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                className="cursor-pointer text-red-500 focus:text-red-500"
-                onClick={() => toast.success("Logged out successfully")}
-              >
-                Log Out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {user ? (
+            <>
+              {/* Profile dropdown for logged-in users */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="rounded-full w-9 h-9 p-0">
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback className="bg-wallpaper-purple text-white">
+                        {profile?.username?.charAt(0) || user.email?.charAt(0) || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <div className="flex items-center justify-start p-2">
+                    <Avatar className="h-8 w-8 mr-2">
+                      <AvatarFallback>{profile?.username?.charAt(0) || user.email?.charAt(0) || 'U'}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col space-y-0.5">
+                      <p className="text-sm font-medium">{profile?.username || user.email}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {isAdmin ? 'Admin' : 'User'}
+                      </p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  
+                  {isAdmin && (
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin" className="cursor-pointer flex items-center">
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload Wallpapers
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
+                  
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer flex items-center">
+                      <Settings className="mr-2 h-4 w-4" />
+                      Profile Settings
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuItem asChild>
+                    <Link to="/favorites" className="cursor-pointer">
+                      Favorites
+                    </Link>
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    className="cursor-pointer text-red-500 focus:text-red-500"
+                    onClick={handleSignOut}
+                  >
+                    Log Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            /* Sign in button for guests */
+            <Button variant="outline" size="sm" onClick={() => navigate('/auth')}>
+              <LogIn className="mr-2 h-4 w-4" />
+              Sign In
+            </Button>
+          )}
         </div>
       </div>
     </header>

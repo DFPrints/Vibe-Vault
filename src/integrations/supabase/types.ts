@@ -9,7 +9,130 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          count: number | null
+          id: string
+          image_url: string
+          name: string
+        }
+        Insert: {
+          count?: number | null
+          id: string
+          image_url: string
+          name: string
+        }
+        Update: {
+          count?: number | null
+          id?: string
+          image_url?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      favorites: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string | null
+          wallpaper_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id?: string | null
+          wallpaper_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string | null
+          wallpaper_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_wallpaper_id_fkey"
+            columns: ["wallpaper_id"]
+            isOneToOne: false
+            referencedRelation: "wallpapers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          id: string
+          is_admin: boolean | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          is_admin?: boolean | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_admin?: boolean | null
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
+      wallpapers: {
+        Row: {
+          category_id: string
+          compatible_devices: string[] | null
+          date_added: string
+          height: number
+          id: string
+          image_url: string
+          similar_wallpapers: string[] | null
+          tags: string[] | null
+          thumbnail_url: string
+          title: string
+          width: number
+        }
+        Insert: {
+          category_id: string
+          compatible_devices?: string[] | null
+          date_added?: string
+          height: number
+          id?: string
+          image_url: string
+          similar_wallpapers?: string[] | null
+          tags?: string[] | null
+          thumbnail_url: string
+          title: string
+          width: number
+        }
+        Update: {
+          category_id?: string
+          compatible_devices?: string[] | null
+          date_added?: string
+          height?: number
+          id?: string
+          image_url?: string
+          similar_wallpapers?: string[] | null
+          tags?: string[] | null
+          thumbnail_url?: string
+          title?: string
+          width?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wallpapers_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -3,11 +3,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { wallpaperService } from '@/services/wallpaperService';
-import WallpaperCard from '@/components/WallpaperCard';
+import EnhancedWallpaperCard from '@/components/EnhancedWallpaperCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import CategoryCard from '@/components/CategoryCard';
+import { useAuth } from '@/context/AuthContext';
 
 const HomePage = () => {
+  const { isAdmin } = useAuth();
   const { data: wallpapers, isPending: isWallpapersPending } = useQuery({
     queryKey: ['wallpapers'],
     queryFn: wallpaperService.getWallpapers
@@ -24,6 +26,18 @@ const HomePage = () => {
         <h1 className="text-2xl font-bold mb-1">Vibe Vault</h1>
         <p className="text-muted-foreground">Find your perfect wallpaper</p>
       </div>
+      
+      {/* Admin Action */}
+      {isAdmin && (
+        <div className="mb-6">
+          <Link
+            to="/admin"
+            className="block w-full bg-wallpaper-purple text-white py-3 rounded-lg text-center hover:bg-wallpaper-purple/90 transition-colors"
+          >
+            Upload New Wallpapers
+          </Link>
+        </div>
+      )}
       
       {/* Categories Section */}
       <section className="mb-8">
@@ -64,7 +78,7 @@ const HomePage = () => {
         ) : (
           <div className="masonry-grid">
             {wallpapers?.map((wallpaper, index) => (
-              <WallpaperCard 
+              <EnhancedWallpaperCard 
                 key={wallpaper.id} 
                 wallpaper={wallpaper} 
                 isTall={index % 3 === 0} 
