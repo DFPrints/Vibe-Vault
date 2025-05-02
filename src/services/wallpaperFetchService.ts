@@ -64,7 +64,7 @@ export const wallpaperFetchService = {
     // Search by tags (requires array contains in Postgres)
     const { data: tagResults, error: tagError } = await supabase.rpc(
       'search_wallpapers_by_tag',
-      { search_term: term } // Fix: Type assertion removed
+      { search_term: term } as { search_term: string } // Fix: Added proper type assertion for RPC parameters
     );
     
     if (tagError) {

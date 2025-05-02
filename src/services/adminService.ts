@@ -60,7 +60,7 @@ export const adminService = {
       // 6. Update the category count
       await supabase.rpc('increment_category_count', { 
         category_id: wallpaperData.category 
-      });
+      } as { category_id: string });  // Fix: Added proper type assertion for RPC parameters
       
       return mapWallpaper(wallpaperRecord);
     } catch (error) {
