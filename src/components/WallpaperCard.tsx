@@ -14,7 +14,7 @@ interface WallpaperCardProps {
 
 const WallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps) => {
   const queryClient = useQueryClient();
-  const [isFav, setIsFav] = React.useState(wallpaper.isFavorite || wallpaperService.isFavorite(wallpaper.id));
+  const [isFav, setIsFav] = React.useState<boolean>(wallpaper.isFavorite || wallpaperService.isFavorite(wallpaper.id));
   
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();

@@ -191,25 +191,18 @@ export const wallpaperService = {
     }
   },
   
-  isFavorite: async (wallpaperId: string): Promise<boolean> => {
-    const { data: session } = await supabase.auth.getSession();
+  isFavorite: (wallpaperId: string): boolean => {
+    // This is just a client-side helper function, not an async method
+    // It should return a boolean value, not a promise
+    const favoritesString = localStorage.getItem('favorites');
+    if (!favoritesString) return false;
     
-    if (!session.session?.user) {
+    try {
+      const favorites = JSON.parse(favoritesString);
+      return Array.isArray(favorites) && favorites.includes(wallpaperId);
+    } catch (e) {
       return false;
     }
-    
-    const { data, error } = await supabase
-      .from('favorites')
-      .select('id')
-      .eq('user_id', session.session.user.id)
-      .eq('wallpaper_id', wallpaperId)
-      .single();
-    
-    if (error || !data) {
-      return false;
-    }
-    
-    return true;
   },
 
   // Admin methods for wallpaper management
@@ -257,7 +250,7 @@ export const wallpaperService = {
           thumbnail_url: thumbnailUrl,
           category_id: wallpaperData.category,
           tags: wallpaperData.tags,
-          compatible_devices: wallpaperData.compatibleDevices,
+          compatible_devices: wallpaperData.compatibleDevices || [],
           width: img.width,
           height: img.height
         })
