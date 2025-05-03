@@ -11,6 +11,7 @@ export const wallpaperService = {
   getWallpaperById: wallpaperFetchService.getWallpaperById,
   getWallpapersByCategory: wallpaperFetchService.getWallpapersByCategory,
   searchWallpapers: wallpaperFetchService.searchWallpapers,
+  searchWallpapersByTag: wallpaperFetchService.searchWallpapersByTag,
   
   // Category operations
   getCategories: categoryService.getCategories,

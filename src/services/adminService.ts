@@ -35,7 +35,7 @@ export const adminService = {
       const imageUrl = publicUrlData.publicUrl;
       
       // 3. Create thumbnail version (using the same URL with different parameters)
-      const thumbnailUrl = imageUrl.replace('?', '?width=500&quality=60&');
+      const thumbnailUrl = imageUrl;
       
       // 4. Get image dimensions
       const img = new Image();
@@ -62,10 +62,10 @@ export const adminService = {
       
       if (insertError) throw insertError;
       
-      // 6. Update the category count
-      const { error: rpcError } = await supabase.rpc<void, IncrementCategoryCountParams>(
+      // 6. Update the category count - fix type issue
+      const { error: rpcError } = await supabase.rpc(
         'increment_category_count',
-        { category_id: wallpaperData.category }
+        { category_id: wallpaperData.category } as IncrementCategoryCountParams
       );
       
       if (rpcError) console.error("Error updating category count:", rpcError);
