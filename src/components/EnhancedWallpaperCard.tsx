@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Smartphone, Monitor, Tablet, Tv } from 'lucide-react';
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card';
+import ImageBanner from './ImageBanner';
 
 interface WallpaperCardProps {
   wallpaper: Wallpaper;
@@ -31,6 +32,31 @@ const EnhancedWallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps
   const { width, height } = wallpaper.dimensions;
   const resolution = `${width}x${height}`;
   
+  // Determine if a wallpaper should have a banner based on properties
+  // This is sample logic - you may want to use actual properties from your wallpaper data
+  const showBanner = () => {
+    if (wallpaper.date_added && isNew(wallpaper.date_added)) {
+      return 'new';
+    }
+    if (wallpaper.views && wallpaper.views > 100) {
+      return 'popular';
+    }
+    if (wallpaper.featured) {
+      return 'featured';
+    }
+    return null;
+  };
+  
+  // Check if wallpaper was added within the last 7 days
+  const isNew = (dateString: string) => {
+    const wallpaperDate = new Date(dateString);
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    return wallpaperDate > sevenDaysAgo;
+  };
+  
+  const bannerType = showBanner();
+  
   return (
     <Link
       to={`/wallpaper/${wallpaper.id}`}
@@ -47,6 +73,9 @@ const EnhancedWallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps
         className="w-full h-full object-cover"
         loading="lazy"
       />
+      
+      {/* Banner indicator if applicable */}
+      {bannerType && <ImageBanner type={bannerType} />}
       
       {/* Resolution badge */}
       <div className="absolute top-2 left-2 z-20">

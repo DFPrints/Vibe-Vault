@@ -8,6 +8,7 @@ import { ArrowLeft, Share2, Download, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useWallpaper } from '@/context/WallpaperContext';
+import ImageBanner from '@/components/ImageBanner';
 
 const WallpaperDetailPage = () => {
   const { wallpaperId } = useParams<{ wallpaperId: string }>();
@@ -45,6 +46,30 @@ const WallpaperDetailPage = () => {
     );
   }
 
+  // Determine if a wallpaper should have a banner
+  const showBanner = () => {
+    if (wallpaper.date_added && isNew(wallpaper.date_added)) {
+      return 'new';
+    }
+    if (wallpaper.views && wallpaper.views > 100) {
+      return 'popular';
+    }
+    if (wallpaper.featured) {
+      return 'featured';
+    }
+    return null;
+  };
+  
+  // Check if wallpaper was added within the last 7 days
+  const isNew = (dateString: string) => {
+    const wallpaperDate = new Date(dateString);
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    return wallpaperDate > sevenDaysAgo;
+  };
+  
+  const bannerType = showBanner();
+
   const handleDownload = () => {
     // In a real app, this would handle download functionality
     // For now, we'll just show a toast
@@ -74,7 +99,9 @@ const WallpaperDetailPage = () => {
         </Button>
       </div>
       
-      <div className="flex-1 flex items-center justify-center overflow-hidden">
+      <div className="flex-1 flex items-center justify-center overflow-hidden relative">
+        {bannerType && <ImageBanner type={bannerType} className="m-4 rounded-sm" />}
+        
         <img
           src={wallpaper.imageUrl}
           alt={wallpaper.title}

@@ -6,6 +6,7 @@ import { HeartIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { wallpaperService } from '@/services/wallpaperService';
 import { useQueryClient } from '@tanstack/react-query';
+import ImageBanner from './ImageBanner';
 
 interface WallpaperCardProps {
   wallpaper: Wallpaper;
@@ -15,6 +16,30 @@ interface WallpaperCardProps {
 const WallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps) => {
   const queryClient = useQueryClient();
   const [isFav, setIsFav] = React.useState<boolean>(wallpaper.isFavorite || wallpaperService.isFavorite(wallpaper.id));
+  
+  // Determine if a wallpaper should have a banner
+  const showBanner = () => {
+    if (wallpaper.date_added && isNew(wallpaper.date_added)) {
+      return 'new';
+    }
+    if (wallpaper.views && wallpaper.views > 100) {
+      return 'popular';
+    }
+    if (wallpaper.featured) {
+      return 'featured';
+    }
+    return null;
+  };
+  
+  // Check if wallpaper was added within the last 7 days
+  const isNew = (dateString: string) => {
+    const wallpaperDate = new Date(dateString);
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    return wallpaperDate > sevenDaysAgo;
+  };
+  
+  const bannerType = showBanner();
   
   const toggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -40,6 +65,9 @@ const WallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps) => {
       )}
     >
       <Link to={`/wallpaper/${wallpaper.id}`} className="block w-full h-full">
+        {/* Banner indicator if applicable */}
+        {bannerType && <ImageBanner type={bannerType} />}
+        
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/40 opacity-0 group-hover:opacity-100 transition-opacity z-10"></div>
         
         <img 
