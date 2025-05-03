@@ -48,13 +48,13 @@ const WallpaperDetailPage = () => {
 
   // Determine if a wallpaper should have a banner
   const showBanner = () => {
-    if (wallpaper.date_added && isNew(wallpaper.date_added)) {
+    if (wallpaper?.dateAdded && isNew(wallpaper.dateAdded)) {
       return 'new';
     }
-    if (wallpaper.views && wallpaper.views > 100) {
+    if (wallpaper?.views && wallpaper.views > 100) {
       return 'popular';
     }
-    if (wallpaper.featured) {
+    if (wallpaper?.featured) {
       return 'featured';
     }
     return null;

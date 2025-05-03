@@ -1,4 +1,3 @@
-
 import { Wallpaper } from '@/types/wallpaper';
 import { Link } from 'react-router-dom';
 import { HeartIcon } from 'lucide-react';
@@ -33,9 +32,8 @@ const EnhancedWallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps
   const resolution = `${width}x${height}`;
   
   // Determine if a wallpaper should have a banner based on properties
-  // This is sample logic - you may want to use actual properties from your wallpaper data
   const showBanner = () => {
-    if (wallpaper.date_added && isNew(wallpaper.date_added)) {
+    if (wallpaper.dateAdded && isNew(wallpaper.dateAdded)) {
       return 'new';
     }
     if (wallpaper.views && wallpaper.views > 100) {

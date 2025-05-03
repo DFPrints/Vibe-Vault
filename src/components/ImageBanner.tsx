@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Banner } from 'lucide-react';
+import { Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 type BannerType = 'popular' | 'new' | 'featured';
@@ -32,7 +32,7 @@ const ImageBanner = ({ type, className }: ImageBannerProps) => {
 
   return (
     <div className={cn(baseClasses, config.classes, className)}>
-      <Banner size={14} />
+      <Tag size={14} />
       <span>{config.text}</span>
     </div>
   );

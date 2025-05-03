@@ -14,6 +14,9 @@ export interface Wallpaper {
   similar_wallpapers?: string[];
   isFavorite?: boolean;
   dateAdded: string;
+  views?: number;
+  featured?: boolean;
+  date_added?: string; // For backwards compatibility with API responses
 }
 
 export interface Category {

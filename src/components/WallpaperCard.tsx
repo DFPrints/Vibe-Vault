@@ -19,7 +19,7 @@ const WallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps) => {
   
   // Determine if a wallpaper should have a banner
   const showBanner = () => {
-    if (wallpaper.date_added && isNew(wallpaper.date_added)) {
+    if (wallpaper.dateAdded && isNew(wallpaper.dateAdded)) {
       return 'new';
     }
     if (wallpaper.views && wallpaper.views > 100) {
