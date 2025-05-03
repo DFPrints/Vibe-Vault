@@ -89,9 +89,8 @@ export const wallpaperFetchService = {
   
   searchWallpapersByTag: async (tag: string): Promise<Wallpaper[]> => {
     try {
-      // Fix type issues with the RPC call by using Record<string, any>[] as the return type
-      // This is a more general type that can be mapped to Wallpaper[]
-      const { data, error } = await supabase.rpc<Record<string, any>[], SearchWallpapersByTagParams>(
+      // Fix the type issues by using any as the return type
+      const { data, error } = await supabase.rpc<any, SearchWallpapersByTagParams>(
         'search_wallpapers_by_tag',
         { search_tag: tag }
       );

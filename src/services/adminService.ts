@@ -63,8 +63,8 @@ export const adminService = {
       if (insertError) throw insertError;
       
       // 6. Update the category count - fix by providing proper type parameters
-      // Use void as return type since we don't care about the return value
-      const { error: rpcError } = await supabase.rpc<void, IncrementCategoryCountParams>(
+      // Use any as return type since we don't care about the return value
+      const { error: rpcError } = await supabase.rpc<any, IncrementCategoryCountParams>(
         'increment_category_count',
         { category_id: wallpaperData.category }
       );
