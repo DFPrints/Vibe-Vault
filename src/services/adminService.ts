@@ -1,80 +1,79 @@
+import { AddWallpaperData } from '@/types/admin';
+import { createClient } from '@supabase/supabase-js';
 
-import { supabase } from '@/integrations/supabase/client';
-import { Wallpaper } from '../types/wallpaper';
-import { mapWallpaper } from './mappers';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// Define proper type for the RPC function parameters and return type
-type IncrementCategoryCountParams = {
-  category_id: string;
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Supabase URL and Anon Key must be provided in environment variables.');
+}
+
+// Ensure that the types for createClient are correctly inferred
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+const addWallpaper = async (wallpaperData: AddWallpaperData): Promise<void> => {
+  try {
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError) {
+      console.error('Error getting session:', sessionError);
+      throw new Error('Could not retrieve session');
+    }
+
+    const session = sessionData?.session;
+
+    if (!session) {
+      console.error('No session found.');
+      throw new Error('No session found');
+    }
+
+    const { data: clientData, error: clientError } = await supabase
+      .from('clients')
+      .select('id')
+      .eq('user_id', session.user.id)
+      .single();
+
+    if (clientError) {
+      console.error('Error fetching client:', clientError);
+      throw new Error('Could not retrieve client');
+    }
+
+    const client = clientData;
+
+    if (!client) {
+      console.error('No client found for the user.');
+      throw new Error('No client found for the user');
+    }
+
+    const { error } = await supabase
+      .from('wallpapers')
+      .insert([
+        {
+          ...wallpaperData,
+          client_id: client.id,
+        },
+      ]);
+
+    if (error) {
+      console.error('Error inserting wallpaper:', error);
+      throw new Error('Could not insert wallpaper');
+    }
+
+    const { error: rpcError } = await supabase.rpc(
+      'increment_category_count',
+      { category_id: wallpaperData.category }
+    );
+    
+    if (rpcError) {
+      console.error('Error incrementing category count:', rpcError);
+    }
+
+  } catch (error) {
+    console.error('Error in addWallpaper:', error);
+    throw error;
+  }
 };
 
 export const adminService = {
-  uploadWallpaper: async (
-    file: File,
-    wallpaperData: {
-      title: string;
-      category: string;
-      tags: string[];
-      compatibleDevices: string[];
-    }
-  ): Promise<Wallpaper | null> => {
-    try {
-      // 1. Upload the image to storage
-      const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '-')}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('wallpapers')
-        .upload(fileName, file);
-      
-      if (uploadError) throw uploadError;
-      
-      // 2. Get the public URL
-      const { data: publicUrlData } = supabase.storage
-        .from('wallpapers')
-        .getPublicUrl(fileName);
-      
-      const imageUrl = publicUrlData.publicUrl;
-      
-      // 3. Create thumbnail version (using the same URL with different parameters)
-      const thumbnailUrl = imageUrl;
-      
-      // 4. Get image dimensions
-      const img = new Image();
-      img.src = imageUrl;
-      await new Promise(resolve => {
-        img.onload = resolve;
-      });
-      
-      // 5. Insert the wallpaper into the database
-      const { data: wallpaperRecord, error: insertError } = await supabase
-        .from('wallpapers')
-        .insert({
-          title: wallpaperData.title,
-          image_url: imageUrl,
-          thumbnail_url: thumbnailUrl,
-          category_id: wallpaperData.category,
-          tags: wallpaperData.tags,
-          compatible_devices: wallpaperData.compatibleDevices || [],
-          width: img.width,
-          height: img.height
-        })
-        .select()
-        .single();
-      
-      if (insertError) throw insertError;
-      
-      // 6. Update the category count - fix by providing proper type parameters
-      // Use any as return type since we don't care about the return value
-      const { error: rpcError } = await supabase.rpc<any, IncrementCategoryCountParams>(
-        'increment_category_count',
-        { category_id: wallpaperData.category }
-      );
-      
-      if (rpcError) console.error("Error updating category count:", rpcError);
-      
-      return mapWallpaper(wallpaperRecord);
-    } catch (error) {
-      console.error("Error uploading wallpaper:", error);
-      return null;
-    }
-  }
+  addWallpaper,
 };

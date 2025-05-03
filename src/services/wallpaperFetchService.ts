@@ -1,115 +1,168 @@
+import { SupabaseClient } from '@supabase/supabase-js';
+import { Wallpaper, ApiWallpaper } from '../types/wallpaper';
 
-import { supabase } from '@/integrations/supabase/client';
-import { Wallpaper } from '../types/wallpaper';
-import { mapWallpaper } from './mappers';
+// Function to map API wallpaper object to app wallpaper object
+const mapApiWallpaperToApp = (apiWallpaper: ApiWallpaper): Wallpaper => ({
+  id: apiWallpaper.id,
+  title: apiWallpaper.title,
+  imageUrl: apiWallpaper.image_url,
+  thumbnailUrl: apiWallpaper.thumbnail_url,
+  dateAdded: apiWallpaper.date_added,
+  views: apiWallpaper.views,
+  featured: apiWallpaper.featured,
+  isFavorite: apiWallpaper.is_favorite,
+  category: apiWallpaper.category,
+  tags: apiWallpaper.tags,
+  dimensions: {
+    width: apiWallpaper.width,
+    height: apiWallpaper.height,
+  },
+  compatible_devices: apiWallpaper.compatible_devices,
+});
 
-// Define type for search parameters
-type SearchWallpapersByTagParams = {
-  search_tag: string;
+const getWallpapers = async (supabase: SupabaseClient): Promise<Wallpaper[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('wallpapers')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching wallpapers:', error);
+      return [];
+    }
+
+    return data.map(mapApiWallpaperToApp);
+  } catch (error) {
+    console.error('Exception in getWallpapers:', error);
+    return [];
+  }
 };
 
-export const wallpaperFetchService = {
-  // Add missing methods referenced in wallpaperService
-  getWallpapers: async (): Promise<Wallpaper[]> => {
-    try {
-      const { data, error } = await supabase
-        .from('wallpapers')
-        .select('*')
-        .order('date_added', { ascending: false });
-      
-      if (error) {
-        console.error("Error fetching wallpapers:", error);
-        return [];
-      }
-      
-      return data.map(mapWallpaper);
-    } catch (error) {
-      console.error("Error in getWallpapers:", error);
-      return [];
-    }
-  },
-  
-  getWallpaperById: async (id: string): Promise<Wallpaper | null> => {
-    try {
-      const { data, error } = await supabase
-        .from('wallpapers')
-        .select('*')
-        .eq('id', id)
-        .single();
-      
-      if (error) {
-        console.error("Error fetching wallpaper:", error);
-        return null;
-      }
-      
-      return mapWallpaper(data);
-    } catch (error) {
-      console.error("Error in getWallpaperById:", error);
+const getWallpaperById = async (supabase: SupabaseClient, id: string): Promise<Wallpaper | null> => {
+  try {
+    const { data, error } = await supabase
+      .from('wallpapers')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching wallpaper by ID:', error);
       return null;
     }
-  },
-  
-  getWallpapersByCategory: async (categoryId: string): Promise<Wallpaper[]> => {
-    try {
-      const { data, error } = await supabase
-        .from('wallpapers')
-        .select('*')
-        .eq('category_id', categoryId);
-      
-      if (error) {
-        console.error("Error fetching wallpapers by category:", error);
-        return [];
-      }
-      
-      return data.map(mapWallpaper);
-    } catch (error) {
-      console.error("Error in getWallpapersByCategory:", error);
-      return [];
-    }
-  },
-  
-  searchWallpapers: async (query: string): Promise<Wallpaper[]> => {
-    try {
-      const { data, error } = await supabase
-        .from('wallpapers')
-        .select('*')
-        .ilike('title', `%${query}%`);
-      
-      if (error) {
-        console.error("Error searching wallpapers:", error);
-        return [];
-      }
-      
-      return data.map(mapWallpaper);
-    } catch (error) {
-      console.error("Error in searchWallpapers:", error);
-      return [];
-    }
-  },
-  
-  searchWallpapersByTag: async (tag: string): Promise<Wallpaper[]> => {
-    try {
-      // Fix the type issues by using any as the return type
-      const { data, error } = await supabase.rpc<any, SearchWallpapersByTagParams>(
-        'search_wallpapers_by_tag',
-        { search_tag: tag }
-      );
-      
-      if (error) {
-        console.error("Error searching wallpapers by tag:", error);
-        return [];
-      }
-      
-      // Check that data exists and is an array before mapping
-      if (!data || !Array.isArray(data)) {
-        console.error("Unexpected data format returned from search_wallpapers_by_tag:", data);
-        return [];
-      }
-      
-      return data.map(mapWallpaper);
-    } catch (error) {
-      console.error("Error searching wallpapers:", error);
-      return [];
-    }
+
+    return mapApiWallpaperToApp(data);
+  } catch (error) {
+    console.error('Exception in getWallpaperById:', error);
+    return null;
   }
+};
+
+const getFavoriteWallpapers = async (supabase: SupabaseClient): Promise<Wallpaper[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('wallpapers')
+        .select('*')
+        .eq('is_favorite', true);
+  
+      if (error) {
+        console.error('Error fetching favorite wallpapers:', error);
+        return [];
+      }
+  
+      // Ensure data is not null and is an array before mapping
+      if (!data) {
+        console.warn('No data received for favorite wallpapers.');
+        return [];
+      }
+  
+      return data.map(mapApiWallpaperToApp);
+    } catch (error) {
+      console.error('Exception in getFavoriteWallpapers:', error);
+      return [];
+    }
+  };
+
+const toggleFavoriteWallpaper = async (supabase: SupabaseClient, id: string): Promise<boolean> => {
+  try {
+    // First, get the current is_favorite status
+    const { data: currentWallpaper, error: selectError } = await supabase
+      .from('wallpapers')
+      .select('is_favorite')
+      .eq('id', id)
+      .single();
+
+    if (selectError) {
+      console.error('Error fetching current wallpaper status:', selectError);
+      throw selectError; // Re-throw to be caught by the caller
+    }
+
+    if (!currentWallpaper) {
+      console.error('Wallpaper not found for ID:', id);
+      return false; // Or throw an error, depending on your error handling policy
+    }
+
+    const newFavoriteStatus = !currentWallpaper.is_favorite;
+
+    // Then, update the is_favorite status
+    const { error: updateError } = await supabase
+      .from('wallpapers')
+      .update({ is_favorite: newFavoriteStatus })
+      .eq('id', id);
+
+    if (updateError) {
+      console.error('Error updating wallpaper favorite status:', updateError);
+       throw updateError; // Re-throw to be caught by the caller
+    }
+
+    return newFavoriteStatus;
+  } catch (error) {
+    console.error('Error in toggleFavoriteWallpaper:', error);
+    throw error; // Re-throw to be caught by the caller
+  }
+};
+
+const isFavorite = (id: string): boolean => {
+    try {
+        const favorites = localStorage.getItem('favorites');
+        if (!favorites) return false;
+        const favoriteIds: string[] = JSON.parse(favorites);
+        return favoriteIds.includes(id);
+    } catch (error) {
+        console.error("Error reading localStorage:", error);
+        return false;
+    }
+};
+
+const searchWallpapersByTag = async (supabase: SupabaseClient, tag: string): Promise<Wallpaper[]> => {
+  try {
+    const { data, error } = await supabase.rpc(
+      'search_wallpapers_by_tag',
+      { search_tag: tag }
+    );
+
+    if (error) {
+      console.error('Error searching wallpapers by tag:', error);
+      return [];
+    }
+
+    if (!data || !Array.isArray(data)) {
+      console.error('Invalid data returned from search_wallpapers_by_tag RPC');
+      return [];
+    }
+
+    return data.map(mapApiWallpaperToApp);
+  } catch (error) {
+    console.error('Exception in searchWallpapersByTag:', error);
+    return [];
+  }
+};
+
+export const wallpaperService = {
+  getWallpapers,
+  getWallpaperById,
+  getFavoriteWallpapers,
+  toggleFavorite: toggleFavoriteWallpaper,
+  isFavorite,
+  searchWallpapersByTag
 };

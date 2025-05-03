@@ -88,7 +88,7 @@ const WallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps) => {
               <Badge 
                 key={tag} 
                 variant="secondary" 
-                className="bg-black/60 text-white text-xs border-none"
+                className="glass-dark text-white text-xs border-none"
               >
                 #{tag}
               </Badge>
@@ -96,7 +96,7 @@ const WallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps) => {
             {wallpaper.tags && wallpaper.tags.length > 2 && (
               <Badge 
                 variant="secondary" 
-                className="bg-black/60 text-white text-xs border-none"
+                className="glass-dark text-white text-xs border-none"
               >
                 +{wallpaper.tags.length - 2}
               </Badge>
@@ -104,13 +104,13 @@ const WallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps) => {
           </div>
         )}
         
-        <div className="absolute bottom-0 left-0 right-0 p-3 text-white opacity-0 group-hover:opacity-100 transition-opacity z-20">
-          <h3 className="text-sm font-medium truncate">{wallpaper.title}</h3>
+        <div className="absolute bottom-0 left-0 right-0 p-3 backdrop-blur-md bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+          <h3 className="text-sm font-medium truncate text-white">{wallpaper.title}</h3>
         </div>
         
         <button
           onClick={toggleFavorite}
-          className="absolute top-2 right-2 z-20 p-2 rounded-full bg-black/20 backdrop-blur-sm transform transition-all duration-200 ease-out"
+          className="absolute top-2 right-2 z-20 p-2 rounded-full glass-dark transform transition-all duration-200 ease-out"
         >
           <HeartIcon 
             size={18} 

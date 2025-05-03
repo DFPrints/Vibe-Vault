@@ -107,5 +107,38 @@ export default {
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [
+		require("tailwindcss-animate"),
+		function({ addUtilities }) {
+			const newUtilities = {
+				'.glass': {
+					'backgroundColor': 'rgba(255, 255, 255, 0.15)',
+					'backdropFilter': 'blur(10px)',
+					'borderRadius': 'var(--radius)',
+					'border': '1px solid rgba(255, 255, 255, 0.2)'
+				},
+				'.glass-dark': {
+					'backgroundColor': 'rgba(0, 0, 0, 0.15)',
+					'backdropFilter': 'blur(10px)',
+					'borderRadius': 'var(--radius)',
+					'border': '1px solid rgba(255, 255, 255, 0.1)'
+				},
+				'.glass-card': {
+					'backgroundColor': 'rgba(255, 255, 255, 0.7)',
+					'backdropFilter': 'blur(16px)',
+					'borderRadius': 'var(--radius)',
+					'border': '1px solid rgba(255, 255, 255, 0.2)',
+					'boxShadow': '0 4px 30px rgba(0, 0, 0, 0.1)'
+				},
+				'.frosted': {
+					'backgroundColor': 'rgba(255, 255, 255, 0.9)',
+					'backdropFilter': 'blur(10px)',
+					'borderRadius': 'var(--radius)',
+					'border': '1px solid rgba(255, 255, 255, 0.3)',
+					'boxShadow': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+				},
+			};
+			addUtilities(newUtilities);
+		}
+	],
 } satisfies Config;

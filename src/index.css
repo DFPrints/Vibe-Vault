@@ -33,7 +33,7 @@
     --input: 240 6% 90%;
     --ring: 260 81% 75%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5% 26%;
@@ -92,6 +92,27 @@
 
   body {
     @apply bg-wallpaper-bg text-foreground;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
+  }
+  
+  /* Apple-inspired text selection */
+  ::selection {
+    @apply bg-primary/30 text-foreground;
+  }
+}
+
+@layer utilities {
+  .neo-button {
+    @apply rounded-full px-6 py-3 font-medium transition-all duration-300 shadow-sm hover:shadow-md;
+  }
+  
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 }
 
