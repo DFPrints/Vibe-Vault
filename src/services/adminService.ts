@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Wallpaper } from '../types/wallpaper';
 import { mapWallpaper } from './mappers';
 
-// Define proper type for the RPC function parameters
+// Define proper type for the RPC function parameters and return type
 type IncrementCategoryCountParams = {
   category_id: string;
 };
@@ -62,8 +62,9 @@ export const adminService = {
       
       if (insertError) throw insertError;
       
-      // 6. Update the category count - fix by using properly typed parameter
-      const { error: rpcError } = await supabase.rpc<null, IncrementCategoryCountParams>(
+      // 6. Update the category count - fix by providing proper type parameters
+      // Use void as return type since we don't care about the return value
+      const { error: rpcError } = await supabase.rpc<void, IncrementCategoryCountParams>(
         'increment_category_count',
         { category_id: wallpaperData.category }
       );
