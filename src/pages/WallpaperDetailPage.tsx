@@ -4,11 +4,80 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { wallpaperService } from '@/services/wallpaperService';
 import { toast } from 'sonner';
-import { ArrowLeft, Share2, Download, Heart } from 'lucide-react';
+import { ArrowLeft, Share2, Download, Heart, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useWallpaper } from '@/context/WallpaperContext';
 import ImageBanner from '@/components/ImageBanner';
+import { Badge } from '@/components/ui/badge';
+
+// Map of common tag categories to colors
+const tagColorMap: Record<string, string> = {
+  // Nature
+  nature: "bg-green-500",
+  forest: "bg-green-500",
+  plants: "bg-green-500",
+  mountain: "bg-green-700",
+  ocean: "bg-blue-500",
+  beach: "bg-yellow-500",
+  sky: "bg-blue-400",
+  
+  // Urban
+  city: "bg-gray-500",
+  architecture: "bg-slate-600",
+  street: "bg-slate-500",
+  
+  // Abstract
+  abstract: "bg-purple-500",
+  pattern: "bg-indigo-500",
+  minimal: "bg-gray-700",
+  
+  // Colors
+  dark: "bg-gray-900",
+  light: "bg-gray-300 text-gray-900",
+  colorful: "bg-pink-500",
+  
+  // Mood
+  calm: "bg-blue-300",
+  vibrant: "bg-orange-500",
+  
+  // Seasons
+  summer: "bg-yellow-600",
+  winter: "bg-blue-200 text-blue-900",
+  autumn: "bg-orange-600",
+  spring: "bg-green-400",
+  
+  // Time
+  night: "bg-indigo-900",
+  day: "bg-sky-300 text-sky-900",
+  sunset: "bg-orange-400"
+};
+
+// Function to get tag color
+const getTagColor = (tag: string): string => {
+  const cleanTag = tag.toLowerCase().trim();
+  
+  // Check for exact matches first
+  if (tagColorMap[cleanTag]) {
+    return tagColorMap[cleanTag];
+  }
+  
+  // Check for partial matches
+  for (const [key, value] of Object.entries(tagColorMap)) {
+    if (cleanTag.includes(key) || key.includes(cleanTag)) {
+      return value;
+    }
+  }
+  
+  // Default colors based on string hash for consistent coloring
+  const hash = [...cleanTag].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const colors = [
+    "bg-blue-500", "bg-green-500", "bg-purple-500", "bg-orange-500",
+    "bg-pink-500", "bg-teal-500", "bg-red-500", "bg-indigo-500"
+  ];
+  
+  return colors[hash % colors.length];
+};
 
 const WallpaperDetailPage = () => {
   const { wallpaperId } = useParams<{ wallpaperId: string }>();
@@ -111,11 +180,17 @@ const WallpaperDetailPage = () => {
       
       <div className="p-4 pt-2 bg-gradient-to-t from-black/80 to-transparent text-white">
         <h1 className="text-xl font-bold mb-1">{wallpaper.title}</h1>
-        <div className="flex flex-wrap gap-2 mb-4">
+        
+        {/* Improved tag display */}
+        <div className="flex flex-wrap gap-2 mb-4 max-w-full">
           {wallpaper.tags.map(tag => (
-            <div key={tag} className="text-xs px-2 py-1 bg-white/20 rounded-full">
-              #{tag}
-            </div>
+            <Badge 
+              key={tag} 
+              className={`${getTagColor(tag)} border-none text-white text-xs flex items-center gap-1`}
+            >
+              <Tag size={12} />
+              {tag}
+            </Badge>
           ))}
         </div>
         

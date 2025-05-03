@@ -89,8 +89,8 @@ export const wallpaperFetchService = {
   
   searchWallpapersByTag: async (tag: string): Promise<Wallpaper[]> => {
     try {
-      // Fix the type issue with the RPC call
-      const { data: tagResults, error } = await supabase.rpc<any>(
+      // Fix type issues with the RPC call by providing both type arguments
+      const { data, error } = await supabase.rpc<Wallpaper[], SearchWallpapersByTagParams>(
         'search_wallpapers_by_tag',
         { search_tag: tag }
       );
@@ -100,11 +100,12 @@ export const wallpaperFetchService = {
         return [];
       }
       
-      if (!tagResults || !Array.isArray(tagResults)) {
+      // Check that data exists and is an array before mapping
+      if (!data) {
         return [];
       }
       
-      return tagResults.map(mapWallpaper);
+      return data.map(mapWallpaper);
     } catch (error) {
       console.error("Error searching wallpapers:", error);
       return [];

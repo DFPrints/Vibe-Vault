@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { wallpaperService } from '@/services/wallpaperService';
 import { useQueryClient } from '@tanstack/react-query';
 import ImageBanner from './ImageBanner';
+import { Badge } from '@/components/ui/badge';
 
 interface WallpaperCardProps {
   wallpaper: Wallpaper;
@@ -57,6 +58,9 @@ const WallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps) => {
     }
   };
   
+  // Display up to 2 tags max to prevent overlapping
+  const displayTags = wallpaper.tags?.slice(0, 2) || [];
+  
   return (
     <div 
       className={cn(
@@ -76,6 +80,29 @@ const WallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps) => {
           className="w-full h-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-110"
           loading="lazy"
         />
+        
+        {/* Display tags */}
+        {displayTags.length > 0 && (
+          <div className="absolute top-2 left-2 z-20 flex flex-wrap gap-1">
+            {displayTags.map(tag => (
+              <Badge 
+                key={tag} 
+                variant="secondary" 
+                className="bg-black/60 text-white text-xs border-none"
+              >
+                #{tag}
+              </Badge>
+            ))}
+            {wallpaper.tags && wallpaper.tags.length > 2 && (
+              <Badge 
+                variant="secondary" 
+                className="bg-black/60 text-white text-xs border-none"
+              >
+                +{wallpaper.tags.length - 2}
+              </Badge>
+            )}
+          </div>
+        )}
         
         <div className="absolute bottom-0 left-0 right-0 p-3 text-white opacity-0 group-hover:opacity-100 transition-opacity z-20">
           <h3 className="text-sm font-medium truncate">{wallpaper.title}</h3>

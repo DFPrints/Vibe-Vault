@@ -11,7 +11,7 @@ interface ImageBannerProps {
 }
 
 const ImageBanner = ({ type, className }: ImageBannerProps) => {
-  const baseClasses = "absolute top-0 left-0 z-30 px-2 py-1 text-xs font-medium flex items-center gap-1.5";
+  const baseClasses = "absolute top-0 left-0 z-30 px-2.5 py-1 text-xs font-medium flex items-center gap-1.5";
   
   const bannerConfig = {
     popular: {
@@ -23,7 +23,7 @@ const ImageBanner = ({ type, className }: ImageBannerProps) => {
       text: "New"
     },
     featured: {
-      classes: "bg-wallpaper-purple text-white",
+      classes: "bg-purple-500 text-white",
       text: "Featured"
     }
   };
