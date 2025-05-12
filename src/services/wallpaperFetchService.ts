@@ -1,8 +1,9 @@
+
 import { SupabaseClient } from '@supabase/supabase-js';
-import { Wallpaper, ApiWallpaper } from '../types/wallpaper';
+import { Wallpaper } from '../types/wallpaper';
 
 // Function to map API wallpaper object to app wallpaper object
-const mapApiWallpaperToApp = (apiWallpaper: ApiWallpaper): Wallpaper => ({
+const mapApiWallpaperToApp = (apiWallpaper: any): Wallpaper => ({
   id: apiWallpaper.id,
   title: apiWallpaper.title,
   imageUrl: apiWallpaper.image_url,
@@ -31,7 +32,7 @@ const getWallpapers = async (supabase: SupabaseClient): Promise<Wallpaper[]> => 
       return [];
     }
 
-    return data.map(mapApiWallpaperToApp);
+    return data ? data.map(mapApiWallpaperToApp) : [];
   } catch (error) {
     console.error('Exception in getWallpapers:', error);
     return [];
@@ -58,6 +59,25 @@ const getWallpaperById = async (supabase: SupabaseClient, id: string): Promise<W
   }
 };
 
+const getWallpapersByCategory = async (supabase: SupabaseClient, categoryId: string): Promise<Wallpaper[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('wallpapers')
+      .select('*')
+      .eq('category', categoryId);
+
+    if (error) {
+      console.error('Error fetching wallpapers by category:', error);
+      return [];
+    }
+
+    return data ? data.map(mapApiWallpaperToApp) : [];
+  } catch (error) {
+    console.error('Exception in getWallpapersByCategory:', error);
+    return [];
+  }
+};
+
 const getFavoriteWallpapers = async (supabase: SupabaseClient): Promise<Wallpaper[]> => {
     try {
       const { data, error } = await supabase
@@ -70,7 +90,6 @@ const getFavoriteWallpapers = async (supabase: SupabaseClient): Promise<Wallpape
         return [];
       }
   
-      // Ensure data is not null and is an array before mapping
       if (!data) {
         console.warn('No data received for favorite wallpapers.');
         return [];
@@ -81,7 +100,7 @@ const getFavoriteWallpapers = async (supabase: SupabaseClient): Promise<Wallpape
       console.error('Exception in getFavoriteWallpapers:', error);
       return [];
     }
-  };
+};
 
 const toggleFavoriteWallpaper = async (supabase: SupabaseClient, id: string): Promise<boolean> => {
   try {
@@ -134,12 +153,28 @@ const isFavorite = (id: string): boolean => {
     }
 };
 
+const searchWallpapers = async (supabase: SupabaseClient, query: string): Promise<Wallpaper[]> => {
+  try {
+    const { data, error } = await supabase
+      .from('wallpapers')
+      .select('*')
+      .ilike('title', `%${query}%`);
+
+    if (error) {
+      console.error('Error searching wallpapers:', error);
+      return [];
+    }
+
+    return data ? data.map(mapApiWallpaperToApp) : [];
+  } catch (error) {
+    console.error('Exception in searchWallpapers:', error);
+    return [];
+  }
+};
+
 const searchWallpapersByTag = async (supabase: SupabaseClient, tag: string): Promise<Wallpaper[]> => {
   try {
-    const { data, error } = await supabase.rpc(
-      'search_wallpapers_by_tag',
-      { search_tag: tag }
-    );
+    const { data, error } = await supabase.rpc('search_wallpapers_by_tag', { search_tag: tag });
 
     if (error) {
       console.error('Error searching wallpapers by tag:', error);
@@ -158,11 +193,13 @@ const searchWallpapersByTag = async (supabase: SupabaseClient, tag: string): Pro
   }
 };
 
-export const wallpaperService = {
+export const wallpaperFetchService = {
   getWallpapers,
   getWallpaperById,
+  getWallpapersByCategory,
   getFavoriteWallpapers,
   toggleFavorite: toggleFavoriteWallpaper,
   isFavorite,
+  searchWallpapers,
   searchWallpapersByTag
 };

@@ -56,7 +56,7 @@ const HomePage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4">
-            {categories?.slice(0, 4).map((category) => (
+            {categories && categories.slice(0, 4).map((category) => (
               <CategoryCard key={category.id} category={category} />
             ))}
           </div>
@@ -77,7 +77,7 @@ const HomePage = () => {
           </div>
         ) : (
           <div className="masonry-grid">
-            {wallpapers?.map((wallpaper, index) => (
+            {wallpapers && wallpapers.map((wallpaper, index) => (
               <EnhancedWallpaperCard 
                 key={wallpaper.id} 
                 wallpaper={wallpaper} 

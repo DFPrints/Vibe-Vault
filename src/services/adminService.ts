@@ -1,3 +1,4 @@
+
 import { AddWallpaperData } from '@/types/admin';
 import { createClient } from '@supabase/supabase-js';
 
@@ -59,6 +60,7 @@ const addWallpaper = async (wallpaperData: AddWallpaperData): Promise<void> => {
       throw new Error('Could not insert wallpaper');
     }
 
+    // Fixed RPC call typing
     const { error: rpcError } = await supabase.rpc(
       'increment_category_count',
       { category_id: wallpaperData.category }

@@ -22,5 +22,5 @@ export const wallpaperService = {
   isFavorite: favoriteService.isFavorite,
   
   // Admin operations
-  uploadWallpaper: adminService.uploadWallpaper
+  addWallpaper: adminService.addWallpaper
 };
