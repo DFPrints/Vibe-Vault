@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { HomeIcon, ImageIcon, SearchIcon, HeartIcon } from 'lucide-react';
+import { HomeIcon, ImageIcon, SearchIcon, HeartIcon, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const Navigation = () => {
@@ -12,11 +12,12 @@ const Navigation = () => {
     { to: '/', icon: HomeIcon, label: 'Home' },
     { to: '/categories', icon: ImageIcon, label: 'Categories' },
     { to: '/search', icon: SearchIcon, label: 'Search' },
-    { to: '/favorites', icon: HeartIcon, label: 'Favorites' }
+    { to: '/favorites', icon: HeartIcon, label: 'Favorites' },
+    { to: '/discover', icon: Sparkles, label: 'Discover' }
   ];
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-background border-t z-50 px-2 pb-safe">
+    <div className="fixed bottom-0 left-0 right-0 bg-background border-t z-50 px-2 pb-safe backdrop-blur-lg">
       <div className="flex justify-around items-center h-16">
         {navItems.map((item) => {
           const isActive = 
@@ -28,7 +29,7 @@ const Navigation = () => {
               key={item.to}
               to={item.to}
               className={cn(
-                "flex flex-col items-center justify-center p-2 rounded-lg w-1/4 tap-highlight-none",
+                "flex flex-col items-center justify-center p-2 rounded-lg w-1/5 tap-highlight-none",
                 isActive 
                   ? "text-wallpaper-purple" 
                   : "text-muted-foreground hover:text-foreground"

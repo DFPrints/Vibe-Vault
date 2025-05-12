@@ -1,4 +1,6 @@
 
+import { ContentRating, DeviceType } from './wallpaper';
+
 export interface AddWallpaperData {
   title: string;
   image_url: string;
@@ -7,5 +9,9 @@ export interface AddWallpaperData {
   height?: number;
   category: string;
   tags?: string[];
-  compatible_devices?: string[];
+  compatible_devices?: DeviceType[];
+  content_rating?: ContentRating;
+  description?: string;
+  premium?: boolean;
+  wallpaper_type?: 'static' | 'live' | 'dynamic';
 }

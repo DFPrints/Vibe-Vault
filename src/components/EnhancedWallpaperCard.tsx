@@ -1,11 +1,13 @@
+
 import { Wallpaper } from '@/types/wallpaper';
 import { Link } from 'react-router-dom';
-import { HeartIcon } from 'lucide-react';
+import { HeartIcon, Sparkles, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Smartphone, Monitor, Tablet, Tv } from 'lucide-react';
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card';
 import ImageBanner from './ImageBanner';
+import ContentRatingBadge from './ContentRatingBadge';
 
 interface WallpaperCardProps {
   wallpaper: Wallpaper;
@@ -75,16 +77,17 @@ const EnhancedWallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps
       {/* Banner indicator if applicable */}
       {bannerType && <ImageBanner type={bannerType} />}
       
-      {/* Resolution badge */}
+      {/* Top Left Area - Resolution */}
       <div className="absolute top-2 left-2 z-20">
         <Badge variant="secondary" className="bg-black/60 hover:bg-black/70 text-white border-none">
           {resolution}
         </Badge>
       </div>
       
-      {/* Device compatibility badges */}
-      {wallpaper.compatible_devices && wallpaper.compatible_devices.length > 0 && (
-        <div className="absolute top-2 right-2 z-20">
+      {/* Top Right Area - Device compatibility */}
+      <div className="absolute top-2 right-2 z-20 flex flex-col gap-1 items-end">
+        {/* Device compatibility badges */}
+        {wallpaper.compatible_devices && wallpaper.compatible_devices.length > 0 && (
           <HoverCard>
             <HoverCardTrigger asChild>
               <Badge variant="secondary" className="flex gap-1 bg-black/60 hover:bg-black/70 text-white border-none">
@@ -105,8 +108,29 @@ const EnhancedWallpaperCard = ({ wallpaper, isTall = false }: WallpaperCardProps
               </div>
             </HoverCardContent>
           </HoverCard>
-        </div>
-      )}
+        )}
+        
+        {/* Content Rating Badge */}
+        {wallpaper.content_rating && (
+          <ContentRatingBadge rating={wallpaper.content_rating} />
+        )}
+        
+        {/* Premium Badge */}
+        {wallpaper.premium && (
+          <Badge className="bg-indigo-500/70 border-indigo-400/50 text-white flex items-center gap-1 border-b border-l backdrop-blur-md">
+            <Lock size={12} />
+            <span className="text-xs">Premium</span>
+          </Badge>
+        )}
+        
+        {/* Special type badge */}
+        {wallpaper.wallpaper_type && wallpaper.wallpaper_type !== 'static' && (
+          <Badge className="bg-purple-500/70 border-purple-400/50 text-white flex items-center gap-1 border-b border-l backdrop-blur-md">
+            <Sparkles size={12} />
+            <span className="text-xs capitalize">{wallpaper.wallpaper_type}</span>
+          </Badge>
+        )}
+      </div>
       
       {/* Favorite icon */}
       {wallpaper.isFavorite && (

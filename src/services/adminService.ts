@@ -1,9 +1,6 @@
 
 import { AddWallpaperData } from '@/types/admin';
-import { createClient } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-
-// We will use the existing supabase client instead of creating a new one
 
 const addWallpaper = async (wallpaperData: AddWallpaperData): Promise<void> => {
   try {
@@ -21,32 +18,39 @@ const addWallpaper = async (wallpaperData: AddWallpaperData): Promise<void> => {
       throw new Error('No session found');
     }
 
-    const { data: clientData, error: clientError } = await supabase
-      .from('clients')
-      .select('id')
-      .eq('user_id', session.user.id)
+    // Get the user profile directly using the user ID from the session
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, is_admin')
+      .eq('id', session.user.id)
       .single();
 
-    if (clientError) {
-      console.error('Error fetching client:', clientError);
-      throw new Error('Could not retrieve client');
+    if (profileError) {
+      console.error('Error fetching profile:', profileError);
+      throw new Error('Could not retrieve user profile');
     }
 
-    const client = clientData;
-
-    if (!client) {
-      console.error('No client found for the user.');
-      throw new Error('No client found for the user');
+    if (!profileData) {
+      console.error('No profile found for the user.');
+      throw new Error('No profile found for the user');
     }
+
+    // Prepare wallpaper data with correct field names
+    const wallpaperInsertData = {
+      title: wallpaperData.title,
+      image_url: wallpaperData.image_url,
+      thumbnail_url: wallpaperData.thumbnail_url || wallpaperData.image_url,
+      width: wallpaperData.width || 1920,
+      height: wallpaperData.height || 1080,
+      category_id: wallpaperData.category,
+      tags: wallpaperData.tags || [],
+      compatible_devices: wallpaperData.compatible_devices || [],
+      content_rating: wallpaperData.content_rating || 'everyone'
+    };
 
     const { error } = await supabase
       .from('wallpapers')
-      .insert([
-        {
-          ...wallpaperData,
-          client_id: client.id,
-        },
-      ]);
+      .insert(wallpaperInsertData);
 
     if (error) {
       console.error('Error inserting wallpaper:', error);

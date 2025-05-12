@@ -19,6 +19,7 @@ import PricingPage from "./pages/PricingPage";
 import ProfilePage from "./pages/ProfilePage";
 import AuthPage from "./pages/AuthPage";
 import AdminPage from "./pages/AdminPage";
+import DiscoverPage from "./pages/DiscoverPage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -45,6 +46,7 @@ const App = () => (
                     <Route path="/categories" element={<CategoriesPage />} />
                     <Route path="/category/:categoryId" element={<CategoryDetailPage />} />
                     <Route path="/search" element={<SearchPage />} />
+                    <Route path="/discover" element={<DiscoverPage />} />
                     <Route path="/favorites" element={
                       <ProtectedRoute>
                         <FavoritesPage />

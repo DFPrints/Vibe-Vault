@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { wallpaperService } from '@/services/wallpaperService';
 import { Input } from '@/components/ui/input';
 import { SearchIcon, XIcon } from 'lucide-react';
@@ -8,18 +9,30 @@ import WallpaperCard from '@/components/WallpaperCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const SearchPage = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedTerm, setDebouncedTerm] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate();
+  const query = new URLSearchParams(location.search).get('q') || '';
+  const [searchTerm, setSearchTerm] = useState(query);
+  const [debouncedTerm, setDebouncedTerm] = useState(query);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  
+  // Update search term when URL query changes
+  useEffect(() => {
+    setSearchTerm(query);
+    setDebouncedTerm(query);
+  }, [query]);
   
   // Debounce search term
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedTerm(searchTerm);
+      if (searchTerm.trim() && searchTerm !== query) {
+        navigate(`/search?q=${encodeURIComponent(searchTerm)}`, { replace: true });
+      }
     }, 500);
     
     return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [searchTerm, navigate, query]);
   
   // Focus input on mount
   useEffect(() => {
@@ -39,6 +52,7 @@ const SearchPage = () => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
+    navigate('/search');
   };
   
   return (
@@ -55,7 +69,7 @@ const SearchPage = () => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder="Search wallpapers..."
-          className="pl-10 pr-10 py-6"
+          className="pl-10 pr-10 py-6 glass-card"
         />
         
         {searchTerm && (
