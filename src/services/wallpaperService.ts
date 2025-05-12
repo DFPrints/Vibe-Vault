@@ -7,11 +7,11 @@ import { adminService } from './adminService';
 // Combine all services into a single wallpaperService export
 export const wallpaperService = {
   // Wallpaper fetching operations
-  getWallpapers: wallpaperFetchService.getWallpapers,
-  getWallpaperById: wallpaperFetchService.getWallpaperById,
-  getWallpapersByCategory: wallpaperFetchService.getWallpapersByCategory,
-  searchWallpapers: wallpaperFetchService.searchWallpapers,
-  searchWallpapersByTag: wallpaperFetchService.searchWallpapersByTag,
+  getWallpapers: () => wallpaperFetchService.getWallpapers(),
+  getWallpaperById: (id: string) => wallpaperFetchService.getWallpaperById(id),
+  getWallpapersByCategory: (categoryId: string) => wallpaperFetchService.getWallpapersByCategory(categoryId),
+  searchWallpapers: (query: string) => wallpaperFetchService.searchWallpapers(query),
+  searchWallpapersByTag: (tag: string) => wallpaperFetchService.searchWallpapersByTag(tag),
   
   // Category operations
   getCategories: categoryService.getCategories,

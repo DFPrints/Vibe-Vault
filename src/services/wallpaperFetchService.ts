@@ -1,6 +1,7 @@
 
 import { SupabaseClient } from '@supabase/supabase-js';
 import { Wallpaper } from '../types/wallpaper';
+import { supabase as defaultSupabase } from '@/integrations/supabase/client';
 
 // Function to map API wallpaper object to app wallpaper object
 const mapApiWallpaperToApp = (apiWallpaper: any): Wallpaper => ({
@@ -21,9 +22,10 @@ const mapApiWallpaperToApp = (apiWallpaper: any): Wallpaper => ({
   compatible_devices: apiWallpaper.compatible_devices,
 });
 
-const getWallpapers = async (supabase: SupabaseClient): Promise<Wallpaper[]> => {
+// Updated function signature to make supabase parameter optional with default value
+const getWallpapers = async (supabaseClient = defaultSupabase): Promise<Wallpaper[]> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('wallpapers')
       .select('*');
 
@@ -39,9 +41,9 @@ const getWallpapers = async (supabase: SupabaseClient): Promise<Wallpaper[]> => 
   }
 };
 
-const getWallpaperById = async (supabase: SupabaseClient, id: string): Promise<Wallpaper | null> => {
+const getWallpaperById = async (id: string, supabaseClient = defaultSupabase): Promise<Wallpaper | null> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('wallpapers')
       .select('*')
       .eq('id', id)
@@ -59,9 +61,9 @@ const getWallpaperById = async (supabase: SupabaseClient, id: string): Promise<W
   }
 };
 
-const getWallpapersByCategory = async (supabase: SupabaseClient, categoryId: string): Promise<Wallpaper[]> => {
+const getWallpapersByCategory = async (categoryId: string, supabaseClient = defaultSupabase): Promise<Wallpaper[]> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('wallpapers')
       .select('*')
       .eq('category', categoryId);
@@ -78,9 +80,9 @@ const getWallpapersByCategory = async (supabase: SupabaseClient, categoryId: str
   }
 };
 
-const getFavoriteWallpapers = async (supabase: SupabaseClient): Promise<Wallpaper[]> => {
+const getFavoriteWallpapers = async (supabaseClient = defaultSupabase): Promise<Wallpaper[]> => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('wallpapers')
         .select('*')
         .eq('is_favorite', true);
@@ -102,10 +104,10 @@ const getFavoriteWallpapers = async (supabase: SupabaseClient): Promise<Wallpape
     }
 };
 
-const toggleFavoriteWallpaper = async (supabase: SupabaseClient, id: string): Promise<boolean> => {
+const toggleFavoriteWallpaper = async (id: string, supabaseClient = defaultSupabase): Promise<boolean> => {
   try {
     // First, get the current is_favorite status
-    const { data: currentWallpaper, error: selectError } = await supabase
+    const { data: currentWallpaper, error: selectError } = await supabaseClient
       .from('wallpapers')
       .select('is_favorite')
       .eq('id', id)
@@ -124,7 +126,7 @@ const toggleFavoriteWallpaper = async (supabase: SupabaseClient, id: string): Pr
     const newFavoriteStatus = !currentWallpaper.is_favorite;
 
     // Then, update the is_favorite status
-    const { error: updateError } = await supabase
+    const { error: updateError } = await supabaseClient
       .from('wallpapers')
       .update({ is_favorite: newFavoriteStatus })
       .eq('id', id);
@@ -153,9 +155,9 @@ const isFavorite = (id: string): boolean => {
     }
 };
 
-const searchWallpapers = async (supabase: SupabaseClient, query: string): Promise<Wallpaper[]> => {
+const searchWallpapers = async (query: string, supabaseClient = defaultSupabase): Promise<Wallpaper[]> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('wallpapers')
       .select('*')
       .ilike('title', `%${query}%`);
@@ -172,9 +174,9 @@ const searchWallpapers = async (supabase: SupabaseClient, query: string): Promis
   }
 };
 
-const searchWallpapersByTag = async (supabase: SupabaseClient, tag: string): Promise<Wallpaper[]> => {
+const searchWallpapersByTag = async (tag: string, supabaseClient = defaultSupabase): Promise<Wallpaper[]> => {
   try {
-    const { data, error } = await supabase.rpc('search_wallpapers_by_tag', { search_tag: tag });
+    const { data, error } = await supabaseClient.rpc('search_wallpapers_by_tag', { search_tag: tag });
 
     if (error) {
       console.error('Error searching wallpapers by tag:', error);

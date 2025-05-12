@@ -1,16 +1,9 @@
 
 import { AddWallpaperData } from '@/types/admin';
 import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase URL and Anon Key must be provided in environment variables.');
-}
-
-// Ensure that the types for createClient are correctly inferred
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// We will use the existing supabase client instead of creating a new one
 
 const addWallpaper = async (wallpaperData: AddWallpaperData): Promise<void> => {
   try {

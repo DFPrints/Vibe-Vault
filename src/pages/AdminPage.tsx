@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -15,6 +14,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Loader2, Upload, PlusCircle, X, Smartphone, Monitor, Tablet, Tv } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { AddWallpaperData } from '@/types/admin';
 
 const uploadFormSchema = z.object({
   title: z.string().min(3, { message: 'Title must be at least 3 characters' }),
@@ -53,7 +54,7 @@ const AdminPage = () => {
 
   const { data: categories, isPending: isCategoriesLoading } = useQuery({
     queryKey: ['categories'],
-    queryFn: wallpaperService.getCategories
+    queryFn: () => wallpaperService.getCategories()
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,27 +115,62 @@ const AdminPage = () => {
     
     setIsUploading(true);
     try {
-      const result = await wallpaperService.uploadWallpaper(selectedFile, {
-        title: data.title,
-        category: data.category,
-        tags: data.tags,
-        compatibleDevices: data.compatibleDevices,
+      // Upload file to storage
+      const fileExt = selectedFile.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+      const filePath = `wallpapers/${fileName}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('wallpapers')
+        .upload(filePath, selectedFile);
+        
+      if (uploadError) {
+        throw uploadError;
+      }
+      
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('wallpapers')
+        .getPublicUrl(filePath);
+        
+      const publicUrl = publicUrlData.publicUrl;
+      
+      // Create thumbnail (simplified version)
+      const thumbnailUrl = publicUrl; // In a real app, you would generate a thumbnail
+      
+      // Get image dimensions
+      const img = new Image();
+      img.src = URL.createObjectURL(selectedFile);
+      await new Promise(resolve => {
+        img.onload = resolve;
       });
       
-      if (result) {
-        toast.success('Wallpaper uploaded successfully');
-        // Reset form
-        form.reset();
-        setSelectedFile(null);
-        setPreviewUrl(null);
-        if (fileInputRef.current) fileInputRef.current.value = '';
-        
-        // Invalidate queries to refresh data
-        queryClient.invalidateQueries({ queryKey: ['wallpapers'] });
-        queryClient.invalidateQueries({ queryKey: ['categories'] });
-      } else {
-        toast.error('Failed to upload wallpaper');
-      }
+      // Prepare wallpaper data
+      const wallpaperData: AddWallpaperData = {
+        title: data.title,
+        image_url: publicUrl,
+        thumbnail_url: thumbnailUrl,
+        width: img.width,
+        height: img.height,
+        category: data.category,
+        tags: data.tags,
+        compatible_devices: data.compatibleDevices,
+      };
+      
+      // Add wallpaper to database
+      await wallpaperService.addWallpaper(wallpaperData);
+      
+      toast.success('Wallpaper uploaded successfully');
+      // Reset form
+      form.reset();
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      
+      // Invalidate queries to refresh data
+      queryClient.invalidateQueries({ queryKey: ['wallpapers'] });
+      queryClient.invalidateQueries({ queryKey: ['categories'] });
+
     } catch (error) {
       console.error('Upload error:', error);
       toast.error('An error occurred while uploading');
